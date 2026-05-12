@@ -1,0 +1,190 @@
+{
+  "staffs": [
+    {
+      "id": 1,
+      "nome": "Bruno",
+      "username": "bruno",
+      "senha": "H91ydho8",
+      "cargo": "CEO",
+      "setor": [
+        "Administração"
+      ],
+      "carga": 30,
+      "perm": "admin",
+      "cupom": "BRUNO2024",
+      "pct": 15,
+      "online": false,
+      "foto": "",
+      "entrada": "2025-09-12",
+      "ultimaPromo": "2026-03-12",
+      "ultimoAcesso": "2026-05-12T01:48:11.302Z",
+      "usos": 0,
+      "valorGerado": 0,
+      "comissaoTotal": 0,
+      "idRp": null
+    },
+    {
+      "id": 2,
+      "nome": "Souza",
+      "username": "souza",
+      "senha": "Ht01ub68",
+      "cargo": "Administrador",
+      "setor": [
+        "Administração"
+      ],
+      "carga": 25,
+      "perm": "admin",
+      "cupom": "SOUZA10",
+      "pct": 10,
+      "online": false,
+      "foto": "",
+      "entrada": "2025-10-12",
+      "ultimaPromo": "2026-02-12",
+      "ultimoAcesso": null,
+      "usos": 0,
+      "valorGerado": 0,
+      "comissaoTotal": 0,
+      "idRp": null
+    },
+    {
+      "id": 3,
+      "nome": "Veio",
+      "username": "veio",
+      "senha": "H5oaa657",
+      "cargo": "Administrador",
+      "setor": [
+        "Administração"
+      ],
+      "carga": 20,
+      "perm": "admin",
+      "cupom": "VEIO15",
+      "pct": 15,
+      "online": false,
+      "foto": "",
+      "entrada": "2025-11-12",
+      "ultimaPromo": "2026-01-12",
+      "ultimoAcesso": null,
+      "usos": 0,
+      "valorGerado": 0,
+      "comissaoTotal": 0,
+      "idRp": null
+    },
+    {
+      "id": 4,
+      "nome": "Folha",
+      "username": "folha",
+      "senha": "H4x725y8",
+      "cargo": "Diretor",
+      "setor": [
+        "Administração"
+      ],
+      "carga": 22,
+      "perm": "admin",
+      "cupom": "FOLHA20",
+      "pct": 20,
+      "online": false,
+      "foto": "",
+      "entrada": "2025-12-12",
+      "ultimaPromo": "2026-04-12",
+      "ultimoAcesso": null,
+      "usos": 0,
+      "valorGerado": 0,
+      "comissaoTotal": 0,
+      "idRp": null
+    },
+    {
+      "id": 5,
+      "nome": "Leo",
+      "username": "leo",
+      "senha": "Hiapqck6",
+      "cargo": "Administrador",
+      "setor": [
+        "Administração"
+      ],
+      "carga": 18,
+      "perm": "admin",
+      "cupom": "LEO10",
+      "pct": 10,
+      "online": false,
+      "foto": "",
+      "entrada": "2026-01-12",
+      "ultimaPromo": "2026-03-12",
+      "ultimoAcesso": null,
+      "usos": 0,
+      "valorGerado": 0,
+      "comissaoTotal": 0,
+      "idRp": null
+    },
+    {
+      "id": 6,
+      "nome": "Roxy",
+      "username": "roxy",
+      "senha": "Hmyopys7",
+      "cargo": "Administrador",
+      "setor": [
+        "Administração"
+      ],
+      "carga": 20,
+      "perm": "admin",
+      "cupom": "ROXY10",
+      "pct": 10,
+      "online": false,
+      "foto": "",
+      "entrada": "2026-02-12",
+      "ultimaPromo": "2026-04-12",
+      "ultimoAcesso": null,
+      "usos": 0,
+      "valorGerado": 0,
+      "comissaoTotal": 0,
+      "idRp": null
+    },
+    {
+      "id": 7,
+      "nome": "Theo",
+      "username": "theo",
+      "senha": "Hmbklgs7",
+      "cargo": "Moderador",
+      "setor": [
+        "Suporte"
+      ],
+      "carga": 15,
+      "perm": "staff",
+      "cupom": "THEO5",
+      "pct": 5,
+      "online": false,
+      "foto": "",
+      "entrada": "2026-03-12",
+      "ultimaPromo": "2026-04-12",
+      "ultimoAcesso": null,
+      "usos": 0,
+      "valorGerado": 0,
+      "comissaoTotal": 0,
+      "idRp": null
+    }
+  ],
+  "cupons": [],
+  "avisos": [
+    {
+      "id": 1,
+      "tipo": "info",
+      "msg": "Bem-vindos ao novo painel de gerenciamento da staff!",
+      "autor": "Sistema",
+      "data": "2026-05-12T01:48:11.303Z"
+    }
+  ],
+  "promovidos": [],
+  "logs": [
+    {
+      "id": 1,
+      "type": "login",
+      "icon": "LogIn",
+      "color": "blue",
+      "msg": "<strong>Sistema</strong> inicializado",
+      "time": "2026-05-12T01:48:11.303Z"
+    }
+  ],
+  "nextId": 8,
+  "nextLogId": 2,
+  "nextAvisoId": 2,
+  "nextCupomId": 1
+}

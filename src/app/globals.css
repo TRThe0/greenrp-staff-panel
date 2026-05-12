@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #080c10; color: #f0f4f8; font-family: 'DM Sans', sans-serif; height: 100%; overflow-x: hidden; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #243447; border-radius: 99px; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes scaleIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+@keyframes glow { 0%,100% { box-shadow:0 0 6px rgba(0,230,118,0.4); } 50% { box-shadow:0 0 18px rgba(0,230,118,0.7); } }
+.fade-up { animation: fadeUp 0.4s ease both; }
+.scale-in { animation: scaleIn 0.25s ease both; }
