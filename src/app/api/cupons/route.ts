@@ -1,24 +1,66 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDB } from '@/lib/mongodb'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET() {
   try {
-    const db = await getDB()
-    const history = await db.collection('cupons').find({}).toArray()
-    const promovidos = await db.collection('promovidos').find({}).toArray()
-    return NextResponse.json({ history: history.map(({_id,...h}:any)=>h), promovidos: promovidos.map(({_id,...p}:any)=>p) })
-  } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 500 }) }
+    const { data: history, error: historyError } = await supabaseAdmin
+      .from('cupons')
+      .select('*')
+
+    const { data: promovidos, error: promovError } = await supabaseAdmin
+      .from('promovidos')
+      .select('*')
+
+    if (historyError || promovError) throw historyError || promovError
+
+    return NextResponse.json({ history: history || [], promovidos: promovidos || [] })
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 })
+  }
 }
 
 export async function POST(req: NextRequest) {
   try {
     const { cupom, usadoPor, valor } = await req.json()
-    const db = await getDB()
-    const staff = await db.collection('staffs').findOne({ cupom: cupom.toUpperCase() })
-    if (!staff) return NextResponse.json({ error: 'Cupom não encontrado' }, { status: 404 })
-    const uso = { id: Date.now(), cupom: cupom.toUpperCase(), staff: staff.nome, usadoPor, valor: Number(valor), data: new Date().toISOString() }
-    await db.collection('cupons').insertOne(uso)
-    await db.collection('staffs').updateOne({ id: staff.id }, { $inc: { usos: 1, valorGerado: Number(valor), comissaoTotal: Number(valor)*(staff.pct/100) } })
+
+    const { data: staff, error: staffError } = await supabaseAdmin
+      .from('staffs')
+      .select('*')
+      .eq('cupom', cupom.toUpperCase())
+      .single()
+
+    if (staffError || !staff) return NextResponse.json({ error: 'Cupom não encontrado' }, { status: 404 })
+
+    const uso = {
+      cupom: cupom.toUpperCase(),
+      staff_id: staff.id,
+      staff_nome: staff.nome,
+      usadoPor,
+      valor: Number(valor),
+      data: new Date().toISOString(),
+    }
+
+    const { error: insertError } = await supabaseAdmin.from('cupons').insert(uso)
+
+    if (insertError) throw insertError
+
+    const novoValor = staff.valorGerado + Number(valor)
+    const novaComissao = novoValor * (staff.pct / 100)
+
+    const { error: updateError } = await supabaseAdmin
+      .from('staffs')
+      .update({
+        usos: staff.usos + 1,
+        valorGerado: novoValor,
+        comissaoTotal: novaComissao,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', staff.id)
+
+    if (updateError) throw updateError
+
     return NextResponse.json(uso, { status: 201 })
-  } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 500 }) }
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 })
+  }
 }

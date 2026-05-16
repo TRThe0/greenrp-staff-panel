@@ -1,20 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDB } from '@/lib/mongodb'
-import { addLog } from '@/lib/db'
+import { supabaseAdmin } from '@/lib/supabase'
+import { addLog } from '@/lib/db-supabase'
 import { checkPass } from '@/lib/utils'
 
 export async function POST(req: NextRequest) {
   try {
     const { username, password } = await req.json()
-    const db = await getDB()
-    const staff = await db.collection('staffs').findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } })
-    if (!staff || !checkPass(password, staff.senha))
+    const { data: staff, error } = await supabaseAdmin
+      .from('staffs')
+      .select('*')
+      .ilike('username', username)
+      .single()
+
+    if (error || !staff || !checkPass(password, staff.senha))
       return NextResponse.json({ error: 'Usuário ou senha inválidos' }, { status: 401 })
-    await db.collection('staffs').updateOne({ id: staff.id }, { $set: { online: true, ultimoAcesso: new Date().toISOString() } })
+
+    // Update online status and last access
+    await supabaseAdmin
+      .from('staffs')
+      .update({
+        online: true,
+        ultimoAcesso: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', staff.id)
+
     await addLog('login', 'LogIn', 'blue', `<strong>${staff.nome}</strong> entrou no painel`)
-    const { senha: _, _id, ...safe } = staff
+
+    const { senha: _, ...safe } = staff
     return NextResponse.json({ staff: safe })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
   }
 }
+

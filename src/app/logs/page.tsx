@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Layout from '@/components/Layout'
 import { formatDateTime, getSession } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { API_BASE } from '@/lib/api'
 
 const COLOR: Record<string,string> = {blue:'#4facfe',green:'#00e676',red:'#ff4757',amber:'#ffa502',purple:'#b388ff'}
 const BG: Record<string,string> = {blue:'rgba(79,172,254,0.12)',green:'rgba(0,230,118,0.12)',red:'rgba(255,71,87,0.12)',amber:'rgba(255,165,2,0.12)',purple:'rgba(179,136,255,0.12)'}
@@ -14,8 +15,8 @@ export default function LogsPage() {
   const [type, setType] = useState('')
 
   useEffect(()=>{if(!getSession()){router.replace('/login');return};load()},[router])
-  async function load(){const r=await fetch('/api/logs');setLogs(await r.json())}
-  async function clear(){if(!confirm('Limpar todos os logs?'))return;await fetch('/api/logs',{method:'DELETE'});load()}
+  async function load(){const r=await fetch(`${API_BASE}/api/logs`);setLogs(await r.json())}
+  async function clear(){if(!confirm('Limpar todos os logs?'))return;await fetch(`${API_BASE}/api/logs`,{method:'DELETE'});load()}
 
   const filtered=logs.filter(l=>{
     const q=search.toLowerCase()

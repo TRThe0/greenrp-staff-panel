@@ -1,18 +1,29 @@
 import { NextResponse } from 'next/server'
-import { getDB } from '@/lib/mongodb'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export async function GET() {
   try {
-    const db = await getDB()
-    const logs = await db.collection('logs').find({}).sort({ id: -1 }).toArray()
-    return NextResponse.json(logs.map(({ _id, ...l }: any) => l))
-  } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 500 }) }
+    const { data: logs, error } = await supabaseAdmin
+      .from('logs')
+      .select('*')
+      .order('id', { ascending: false })
+
+    if (error) throw error
+
+    return NextResponse.json(logs || [])
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 })
+  }
 }
 
 export async function DELETE() {
   try {
-    const db = await getDB()
-    await db.collection('logs').deleteMany({})
+    const { error } = await supabaseAdmin.from('logs').delete().neq('id', 0)
+
+    if (error) throw error
+
     return NextResponse.json({ ok: true })
-  } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 500 }) }
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 })
+  }
 }

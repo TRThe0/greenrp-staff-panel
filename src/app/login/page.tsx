@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { API_BASE } from '@/lib/api'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -15,7 +16,7 @@ export default function LoginPage() {
     if (!username || !password) { setError('Preencha usuário e senha.'); return }
     setLoading(true); setError('')
     try {
-      const res = await fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username,password}) })
+      const res = await fetch(`${API_BASE}/api/auth/login`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username,password}) })
       const data = await res.json()
       if (!res.ok) { setError(data.error||'Erro ao fazer login'); setLoading(false); return }
       const session = JSON.stringify({userId:data.staff.id,perm:data.staff.perm,nome:data.staff.nome,exp:Date.now()+3600000*8})

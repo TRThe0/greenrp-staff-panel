@@ -1,7 +1,8 @@
-'use client'
+"use client"
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { getSession } from '@/lib/utils'
+import { API_BASE } from '@/lib/api'
 
 const NAV = [
   {id:'dashboard',label:'Dashboard',icon:'📊',href:'/dashboard'},
@@ -23,13 +24,13 @@ export default function Layout({ children, page }: { children: React.ReactNode; 
     const s = getSession(); if (!s) { router.replace('/login'); return }
     setSession(s)
     const u = localStorage.getItem('grp_user'); if (u) setUser(JSON.parse(u))
-    fetch('/api/staffs').then(r=>r.json()).then((d:any[])=>setOnline(d.filter(s=>s.online).length))
+    fetch(`${API_BASE}/api/staffs`).then(r=>r.json()).then((d:any[])=>setOnline(d.filter(s=>s.online).length))
     const chk = () => setMobile(window.innerWidth < 900)
     chk(); window.addEventListener('resize',chk); return ()=>window.removeEventListener('resize',chk)
   }, [router])
 
   async function logout() {
-    await fetch('/api/auth/logout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:session?.userId})})
+    await fetch(`${API_BASE}/api/auth/logout`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:session?.userId})})
     localStorage.removeItem('grp_session'); localStorage.removeItem('grp_user'); sessionStorage.removeItem('grp_session')
     router.push('/login')
   }

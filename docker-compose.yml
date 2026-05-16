@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  api:
+    build: ./api-server
+    ports:
+      - '4000:4000'
+    environment:
+      - NODE_ENV=production
+      # Provide SUPABASE envs via host env or secrets
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+
+  web:
+    build: ./vite-app
+    ports:
+      - '5173:5000'
+    environment:
+      - VITE_API_BASE=${VITE_API_BASE:-http://localhost:4000}

@@ -1,57 +1,106 @@
 'use client'
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { DB, Staff, checkPass, addLog, seedIfNeeded } from './db'
+import { API_BASE } from '@/lib/api'
+
+export interface Staff {
+  id: number
+  nome: string
+  username: string
+  cargo: string
+  setor: string[]
+  carga: number
+  perm: 'admin' | 'staff'
+  cupom: string
+  pct: number
+  online: boolean
+  foto: string
+  entrada: string
+  ultimaPromo: string | null
+  ultimoAcesso: string | null
+  usos: number
+  valorGerado: number
+  comissaoTotal: number
+  idRp: number | null
+}
 
 interface AuthCtx {
   user: Staff | null
-  login: (username: string, password: string, remember: boolean) => boolean
-  logout: () => void
+  login: (username: string, password: string, remember: boolean) => Promise<boolean>
+  logout: () => Promise<void>
+  isLoading: boolean
 }
 
-const Ctx = createContext<AuthCtx>({ user: null, login: () => false, logout: () => {} })
+const Ctx = createContext<AuthCtx>({ user: null, login: async () => false, logout: async () => {}, isLoading: true })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<Staff | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    seedIfNeeded()
+    // Restore session on mount
     const raw = localStorage.getItem('grp_session') || sessionStorage.getItem('grp_session')
     if (raw) {
       try {
         const { userId, exp } = JSON.parse(raw)
         if (exp > Date.now()) {
-          const staffs: Staff[] = DB.get('staffs', [])
-          const found = staffs.find(s => s.id === userId)
-          if (found) setUser(found)
+          // Fetch user data from API
+          fetch(`${API_BASE}/api/staffs`)
+            .then((res) => res.json())
+            .then((staffs: Staff[]) => {
+              const found = staffs.find((s) => s.id === userId)
+              if (found) setUser(found)
+            })
+            .catch((err) => console.error('Error restoring session:', err))
+        } else {
+          localStorage.removeItem('grp_session')
+          sessionStorage.removeItem('grp_session')
         }
-      } catch { }
+      } catch (err) {
+        console.error('Error parsing session:', err)
+      }
     }
+    setIsLoading(false)
   }, [])
 
-  function login(username: string, password: string, remember: boolean): boolean {
-    const staffs: Staff[] = DB.get('staffs', [])
-    const found = staffs.find(s => s.username.toLowerCase() === username.toLowerCase())
-    if (!found || !checkPass(password, found.senha)) return false
+  async function login(username: string, password: string, remember: boolean): Promise<boolean> {
+    try {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      })
 
-    const session = { userId: found.id, exp: Date.now() + 3600000 * 8 }
-    if (remember) localStorage.setItem('grp_session', JSON.stringify(session))
-    else sessionStorage.setItem('grp_session', JSON.stringify(session))
+      if (!response.ok) {
+        const error = await response.json()
+        console.error('Login error:', error.error)
+        return false
+      }
 
-    const idx = staffs.findIndex(s => s.id === found.id)
-    staffs[idx].online = true
-    staffs[idx].ultimoAcesso = new Date().toISOString()
-    DB.set('staffs', staffs)
-    addLog('login', 'login', 'blue', `<strong>${found.nome}</strong> entrou no painel`)
-    setUser({ ...found, online: true })
-    return true
+      const { staff } = await response.json()
+
+      const session = { userId: staff.id, exp: Date.now() + 3600000 * 8, perm: staff.perm, nome: staff.nome }
+      if (remember) localStorage.setItem('grp_session', JSON.stringify(session))
+      else sessionStorage.setItem('grp_session', JSON.stringify(session))
+
+      setUser(staff)
+      return true
+    } catch (err) {
+      console.error('Login error:', err)
+      return false
+    }
   }
 
-  function logout() {
+  async function logout() {
     if (user) {
-      const staffs: Staff[] = DB.get('staffs', [])
-      const idx = staffs.findIndex(s => s.id === user.id)
-      if (idx > -1) { staffs[idx].online = false; DB.set('staffs', staffs) }
-      addLog('login', 'log-out', 'red', `<strong>${user.nome}</strong> saiu do painel`)
+      try {
+        await fetch(`${API_BASE}/api/auth/logout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id }),
+        })
+      } catch (err) {
+        console.error('Logout error:', err)
+      }
     }
     localStorage.removeItem('grp_session')
     sessionStorage.removeItem('grp_session')
@@ -59,7 +108,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = '/login'
   }
 
-  return <Ctx.Provider value={{ user, login, logout }}>{children}</Ctx.Provider>
+  return <Ctx.Provider value={{ user, login, logout, isLoading }}>{children}</Ctx.Provider>
 }
 
 export const useAuth = () => useContext(Ctx)

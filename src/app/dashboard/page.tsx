@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Layout from '@/components/Layout'
 import { timeAgo, getSession } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { API_BASE } from '@/lib/api'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -14,7 +15,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!getSession()) { router.replace('/login'); return }
-    Promise.all([fetch('/api/staffs').then(r=>r.json()),fetch('/api/cupons').then(r=>r.json()),fetch('/api/avisos').then(r=>r.json())])
+    Promise.all([fetch(`${API_BASE}/api/staffs`).then(r=>r.json()),fetch(`${API_BASE}/api/cupons`).then(r=>r.json()),fetch(`${API_BASE}/api/avisos`).then(r=>r.json())])
       .then(([s,c,a])=>{ setStaffs(s); setCupons(c.history||[]); setPromovidos(c.promovidos||[]); setAvisos(a) })
       .finally(()=>setLoading(false))
   }, [router])

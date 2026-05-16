@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getDB } from '@/lib/mongodb'
-import { addLog } from '@/lib/db'
+import { supabaseAdmin } from '@/lib/supabase'
+import { addLog } from '@/lib/db-supabase'
 
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await req.json()
-    const db = await getDB()
-    const staff = await db.collection('staffs').findOne({ id: userId })
-    if (staff) {
-      await db.collection('staffs').updateOne({ id: userId }, { $set: { online: false } })
+    const { data: staff, error } = await supabaseAdmin
+      .from('staffs')
+      .select('*')
+      .eq('id', userId)
+      .single()
+
+    if (!error && staff) {
+      await supabaseAdmin
+        .from('staffs')
+        .update({ online: false, updated_at: new Date().toISOString() })
+        .eq('id', userId)
+
       await addLog('login', 'LogOut', 'red', `<strong>${staff.nome}</strong> saiu do painel`)
     }
     return NextResponse.json({ ok: true })

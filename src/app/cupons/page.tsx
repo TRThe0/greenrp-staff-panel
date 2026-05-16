@@ -1,8 +1,9 @@
-'use client'
+"use client"
 import { useEffect, useState } from 'react'
 import Layout from '@/components/Layout'
 import { timeAgo, getSession } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { API_BASE } from '@/lib/api'
 
 export default function CuponsPage() {
   const router = useRouter()
@@ -19,8 +20,8 @@ export default function CuponsPage() {
 
   async function load() {
     const [s, c] = await Promise.all([
-      fetch('/api/staffs').then(r=>r.json()),
-      fetch('/api/cupons').then(r=>r.json())
+      fetch(`${API_BASE}/api/staffs`).then(r=>r.json()),
+      fetch(`${API_BASE}/api/cupons`).then(r=>r.json())
     ])
     setStaffs(s); setHistory(c.history||[])
   }
@@ -28,13 +29,13 @@ export default function CuponsPage() {
   async function resetar() {
     if (!confirm('Resetar TODOS os valores de cupons? Esta ação não pode ser desfeita.')) return
     setResetting(true)
-    await fetch('/api/cupons/reset', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ atorNome: session?.nome }) })
+    await fetch(`${API_BASE}/api/cupons/reset`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ atorNome: session?.nome }) })
     await load()
     setResetting(false)
   }
 
   function copyWebhook() {
-    const url = `${window.location.origin}/api/cupons/webhook`
+    const url = `${API_BASE.replace(/\/api\/?$/, '')}/api/cupons/webhook`
     navigator.clipboard.writeText(url)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -133,7 +134,7 @@ export default function CuponsPage() {
           Quando o cliente finalizar a compra com cupom, seu site deve enviar uma requisição <strong style={{color:'#f0f4f8'}}>POST</strong> para:
         </div>
         <div style={{background:'#0d1218',border:'1px solid #1e2d3d',borderRadius:8,padding:'10px 14px',fontFamily:'monospace',fontSize:13,color:'#00e676',marginBottom:12,wordBreak:'break-all'}}>
-          {typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/api/cupons/webhook
+          {typeof window !== 'undefined' ? window.location.origin : API_BASE.replace(/\/api\/?$/, '')}/api/cupons/webhook
         </div>
         <div style={{fontSize:13,color:'#a8b8c8',marginBottom:8}}>Body JSON:</div>
         <pre style={{background:'#0d1218',border:'1px solid #1e2d3d',borderRadius:8,padding:'12px 14px',fontSize:12,color:'#a8b8c8',overflow:'auto',lineHeight:1.7}}>{`{

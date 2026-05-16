@@ -1,9 +1,10 @@
-'use client'
+"use client"
 import { useEffect, useState } from 'react'
 import Layout from '@/components/Layout'
 import Modal from '@/components/Modal'
 import { timeAgo, getSession } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { API_BASE } from '@/lib/api'
 
 export default function AvisosPage() {
   const router = useRouter()
@@ -14,13 +15,13 @@ export default function AvisosPage() {
   const inp:any={width:'100%',background:'#111820',border:'1px solid #1e2d3d',borderRadius:8,padding:'10px 14px',color:'#f0f4f8',fontSize:14,outline:'none',boxSizing:'border-box',fontFamily:'DM Sans,sans-serif'}
 
   useEffect(()=>{const s=getSession();if(!s){router.replace('/login');return};setSession(s);load()},[router])
-  async function load(){const r=await fetch('/api/avisos');setAvisos(await r.json())}
+  async function load(){const r=await fetch(`${API_BASE}/api/avisos`);setAvisos(await r.json())}
   async function save(){
-    await fetch('/api/avisos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...form,autor:session?.nome})})
+    await fetch(`${API_BASE}/api/avisos`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...form,autor:session?.nome})})
     setModal(false);setForm({tipo:'info',msg:''});load()
   }
   async function remove(id:number){
-    await fetch('/api/avisos',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});load()
+    await fetch(`${API_BASE}/api/avisos/${id}`,{method:'DELETE'});load()
   }
   const bc=(t:string)=>t==='danger'?'#ff4757':t==='warn'?'#ffa502':'#00e676'
 

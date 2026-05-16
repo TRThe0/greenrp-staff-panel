@@ -1,9 +1,10 @@
-'use client'
+"use client"
 import { useEffect, useState } from 'react'
 import Layout from '@/components/Layout'
 import Modal from '@/components/Modal'
 import { formatDate, getSession } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { API_BASE } from '@/lib/api'
 
 const SETORES = ['Ilegal','Legal','Policia','Denuncia','Kids','SS','Evento','Criadores','Administração','Suporte']
 const SC: Record<string,string> = {
@@ -69,7 +70,7 @@ export default function StaffsPage() {
     setSession(s); load()
   }, [router])
 
-  async function load() { const r = await fetch('/api/staffs'); setStaffs(await r.json()) }
+  async function load() { const r = await fetch(`${API_BASE}/api/staffs`); setStaffs(await r.json()) }
   const isAdmin = session?.perm==='admin'
 
   // Normaliza setor para array
@@ -106,7 +107,7 @@ export default function StaffsPage() {
 
   async function save(){
     const payload = { ...form, setor: form.setores || ['Suporte'], atorNome: session?.nome }
-    await fetch(editing?`/api/staffs/${editing.id}`:'/api/staffs',{
+    await fetch(editing?`${API_BASE}/api/staffs/${editing.id}`:`${API_BASE}/api/staffs`,{
       method:editing?'PUT':'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(payload)
@@ -115,12 +116,12 @@ export default function StaffsPage() {
   }
 
   async function remover(id:number){
-    await fetch(`/api/staffs/${id}`,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({atorNome:session?.nome})})
+    await fetch(`${API_BASE}/api/staffs/${id}`,{method:'DELETE'})
     setConfirmId(null); load()
   }
 
   async function promover(){
-    await fetch(`/api/staffs/${promovendo.id}/promover`,{
+    await fetch(`${API_BASE}/api/staffs/${promovendo.id}/promover`,{
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({novoCargo:promoForm.cargo, novoSetor: promoForm.setores || ['Suporte'], atorNome:session?.nome})
     })
