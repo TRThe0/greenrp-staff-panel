@@ -547,7 +547,7 @@ Exemplo de uso local (recomendado para testes):
 export SUPABASE_SERVICE_ROLE_KEY="..."
 export NEXT_PUBLIC_SUPABASE_URL="https://xxxxx.supabase.co"
 export NEXT_PUBLIC_SUPABASE_ANON_KEY="anonkey"
-export VITE_API_BASE="http://localhost:4000"
+export VITE_API_BASE="/api"
 
 docker-compose build
 docker-compose up

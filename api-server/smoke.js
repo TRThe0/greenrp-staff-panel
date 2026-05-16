@@ -1,5 +1,5 @@
 // Simple smoke tests for the API server
-const API_BASE = process.env.API_BASE || 'http://localhost:4000'
+const API_BASE = process.env.API_BASE || '/api'
 
 async function req(path, opts = {}) {
   const url = `${API_BASE}${path}`
